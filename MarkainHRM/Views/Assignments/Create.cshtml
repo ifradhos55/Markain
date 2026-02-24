@@ -1,0 +1,84 @@
+@model OzarkLMS.Models.Assignment
+
+@{
+    var course = ViewBag.Course as OzarkLMS.Models.Course;
+    var isQuiz = Model.Type == "quiz";
+    ViewData["Title"] = isQuiz ? "Create Quiz" : "Create Assignment";
+}
+
+<div class="p-8 max-w-[800px] mx-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950">
+             <h1 class="text-xl font-bold text-[#004B87] dark:text-white">Add New Assignment</h1>
+             <p class="text-sm text-slate-500 dark:text-slate-400">For @course?.Name</p>
+        </div>
+        
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+            <input type="hidden" asp-for="CourseId" />
+            
+            <div>
+                <label asp-for="Title" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Title</label>
+                <input asp-for="Title" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white dark:placeholder-slate-500" placeholder="e.g. Midterm Exam or Essay #1" />
+                <span asp-validation-for="Title" class="text-red-500 text-xs"></span>
+            </div>
+
+            <div>
+                <label asp-for="Description" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Instructions / Description</label>
+                <textarea asp-for="Description" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] min-h-[100px] dark:bg-slate-800 dark:text-white dark:placeholder-slate-500" placeholder="Enter assignment instructions..."></textarea>
+            </div>
+            
+             <div class="mb-4">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Attach Document (Optional)</label>
+                <input type="file" name="attachment" class="w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900 file:text-[#004B87] dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-800 cursor-pointer border border-gray-200 dark:border-slate-700 rounded-lg dark:bg-slate-800" accept=".pdf,.doc,.docx,.jpg,.png" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label asp-for="Type" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Type</label>
+                    <select asp-for="Type" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white" onchange="if(this.value=='quiz'){document.getElementById('sub-type-group').classList.add('opacity-50', 'pointer-events-none')}else{document.getElementById('sub-type-group').classList.remove('opacity-50', 'pointer-events-none')}">
+                        <option value="assignment">Assignment</option>
+                        <option value="quiz">Quiz</option>
+                        <option value="project">Project</option>
+                        <option value="exam">Exam</option>
+                    </select>
+                </div>
+                <div>
+                     <label asp-for="DueDate" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Due Date</label>
+                     <input asp-for="DueDate" type="date" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                 <label asp-for="Points" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Total Points</label>
+                 <input asp-for="Points" type="number" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white" value="100" />
+            </div>
+
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="sub-type-group">
+                    <label asp-for="SubmissionType" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Allowed Submission</label>
+                    <select asp-for="SubmissionType" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white">
+                        <option value="File">File Upload (PDF, Docx, Images)</option>
+                        <option value="Text">Text Entry (Write Online)</option>
+                        <option value="Both">Both (File & Text)</option>
+                    </select>
+                </div>
+                <div>
+                     <label asp-for="MaxAttempts" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Max Attempts</label>
+                     <select asp-for="MaxAttempts" class="w-full rounded-lg border-gray-300 dark:border-slate-700 shadow-sm focus:border-[#004B87] focus:ring-[#004B87] dark:bg-slate-800 dark:text-white">
+                         <option value="Unlimited">Unlimited</option>
+                         <option value="1">1 Attempt</option>
+                         <option value="2">2 Attempts</option>
+                         <option value="3">3 Attempts</option>
+                     </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-6 border-t border-gray-100 dark:border-slate-800">
+                <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" class="mr-4 px-6 py-2 text-slate-500 dark:text-slate-400 font-bold hover:text-slate-700 dark:hover:text-slate-200">Cancel</a>
+                <button type="submit" class="bg-[#004B87] dark:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-[#003d6e] dark:hover:bg-blue-700 shadow-lg shadow-blue-900/20">
+                    Create Assignment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

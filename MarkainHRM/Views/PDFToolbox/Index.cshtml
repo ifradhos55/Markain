@@ -1,0 +1,144 @@
+@{
+    ViewData["Title"] = "pdftools";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .tool-tile:hover .icon-box {
+        transform: scale(1.1) rotate(5deg);
+        background-color: #10b981;
+        color: #022c22;
+    }
+</style>
+
+<div class="p-4 md:p-8 lg:p-12 max-w-[1700px] mx-auto space-y-12 md:space-y-20">
+    <!-- Executive Header -->
+    <div class="space-y-2">
+        <h1 class="text-5xl md:text-6xl font-black text-emerald-950 dark:text-white tracking-tighter leading-none">
+            PDF <span class="text-emerald-500">Toolbox</span>
+        </h1>
+    </div>
+
+    <!-- Feedback Systems -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-3xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-emerald-950">
+                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="font-black text-emerald-950 dark:text-white uppercase text-xs tracking-widest">Protocol Success</p>
+                    <p class="text-emerald-900/60 dark:text-emerald-50/60 text-sm font-bold">@TempData["Success"]</p>
+                </div>
+            </div>
+            @if (TempData["DownloadFile"] != null)
+            {
+                <a asp-action="DownloadFile" asp-route-fileName="@TempData["DownloadFile"]" 
+                   class="bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 px-6 py-3 rounded-2xl font-black text-xs tracking-widest uppercase hover:scale-105 transition-all">
+                    Download File
+                </a>
+            }
+        </div>
+    }
+
+    <!-- Toolkit Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Merge Requisition -->
+        <div class="bg-white dark:bg-emerald-950/20 p-10 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group tool-tile transition-all">
+            <div class="flex items-center gap-6 mb-10">
+                <div>
+                    <h3 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Merge PDF</h3>
+                    <p class="text-emerald-900/40 dark:text-emerald-50/40 text-sm font-bold">Merge PDF files</p>
+                </div>
+            </div>
+
+            <form asp-action="MergePDFs" method="post" enctype="multipart/form-data" class="space-y-6">
+                <div class="relative border-4 border-dashed border-emerald-900/5 dark:border-emerald-50/5 rounded-4xl p-12 text-center cursor-pointer hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all" onclick="document.getElementById('merge-files').click()">
+                    <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-emerald-900/10 dark:text-emerald-50/10 mb-4"></i>
+                    <p class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Drag or Open Files</p>
+                    <input type="file" id="merge-files" name="files" multiple accept=".pdf" class="hidden" onchange="updateFileList('merge')" />
+                </div>
+                
+                <div id="merge-file-list" class="hidden space-y-2">
+                    <div id="merge-files-container" class="grid grid-cols-2 gap-2"></div>
+                </div>
+
+                <button type="submit" id="merge-btn" disabled class="w-full bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl disabled:opacity-20 hover:scale-[1.02] transition-all">
+                    MERGE PDFs
+                </button>
+            </form>
+        </div>
+
+        <!-- Semantic Translation -->
+        <div class="bg-white dark:bg-emerald-950/20 p-10 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group tool-tile transition-all">
+            <div class="flex items-center gap-6 mb-10">
+                <div>
+                    <h3 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">txt to PDF</h3>
+                    <p class="text-emerald-900/40 dark:text-emerald-50/40 text-sm font-bold">Convert txt files to PDF</p>
+                </div>
+            </div>
+
+            <form asp-action="ConvertToPDF" method="post" enctype="multipart/form-data" class="space-y-6">
+                <div class="relative border-4 border-dashed border-emerald-900/5 dark:border-emerald-50/5 rounded-4xl p-12 text-center cursor-pointer hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all" onclick="document.getElementById('convert-file').click()">
+                    <i data-lucide="file-plus" class="w-12 h-12 mx-auto text-emerald-900/10 dark:text-emerald-50/10 mb-4"></i>
+                    <p class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Drag or Open Files</p>
+                    <input type="file" id="convert-file" name="file" accept=".txt" class="hidden" onchange="updateFileList('convert')" />
+                </div>
+
+                <div id="convert-file-info" class="hidden">
+                    <div class="flex items-center gap-4 p-4 bg-emerald-50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <span id="convert-filename" class="text-xs font-black uppercase tracking-widest text-emerald-950 dark:text-white truncate flex-1"></span>
+                        <button type="button" onclick="clearConvertFile()" class="text-emerald-900/20 hover:text-red-500 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="convert-btn" disabled class="w-full bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl disabled:opacity-20 hover:scale-[1.02] transition-all">
+                    CONVERT TO PDF
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFileList(type) {
+        const input = document.getElementById(type === 'merge' ? 'merge-files' : 'convert-file');
+        const btn = document.getElementById(type === 'merge' ? 'merge-btn' : 'convert-btn');
+        const container = type === 'merge' ? document.getElementById('merge-files-container') : null;
+        
+        if (type === 'merge') {
+            container.innerHTML = '';
+            Array.from(input.files).forEach(f => {
+                const d = document.createElement('div');
+                d.className = "flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-500/5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-500/10 text-emerald-950 dark:text-white truncate";
+                d.innerHTML = `<i data-lucide="file" class="w-3 h-3 text-emerald-500"></i> ${f.name}`;
+                container.appendChild(d);
+            });
+            document.getElementById('merge-file-list').classList.remove('hidden');
+            btn.disabled = input.files.length < 2;
+        } else {
+            document.getElementById('convert-filename').innerText = input.files[0]?.name || '';
+            document.getElementById('convert-file-info').classList.toggle('hidden', !input.files[0]);
+            btn.disabled = !input.files[0];
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function clearConvertFile() {
+        document.getElementById('convert-file').value = '';
+        updateFileList('convert');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>

@@ -1,0 +1,309 @@
+@model OzarkLMS.ViewModels.AdminDashboardViewModel
+
+<div class="p-6 lg:p-12 max-w-[1700px] mx-auto space-y-12">
+    <!-- Executive Title -->
+    <div class="space-y-2">
+        <h1 class="text-5xl md:text-6xl font-black text-emerald-950 dark:text-white tracking-tighter leading-none">
+            Admin <span class="text-emerald-500">Dashboard</span>
+        </h1>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group hover:scale-105 transition-all">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Total Workforce</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@ViewBag.EmployeeCount</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group hover:scale-105 transition-all">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Divisions</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@ViewBag.DepartmentCount</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="building-2" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group hover:scale-105 transition-all">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Active Modules</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@ViewBag.CourseCount</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="scroll-text" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium group hover:scale-105 transition-all">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Platform Reach</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@(ViewBag.StudentCount + ViewBag.InstructorCount + ViewBag.EmployeeCount)</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="globe" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administrative Control Hub -->
+    <div class="relative overflow-hidden rounded-4xl bg-emerald-950 p-10 md:p-12 shadow-premium-dark">
+        <div class="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none">
+            <i data-lucide="layout-dashboard" class="w-full h-full text-white"></i>
+        </div>
+
+        <div class="relative z-10 space-y-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Human Capital Management</h2>
+                    <p class="text-emerald-100/40 text-xs font-bold uppercase tracking-widest">Enterprise Operations & Workforce Strategy</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                <a asp-controller="Employee" asp-action="Index" class="bg-white/5 hover:bg-white/10 text-white px-8 py-5 rounded-2xl font-black text-sm border border-white/10 transition-all flex items-center gap-3 group">
+                    <i data-lucide="users" class="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                    WORKFORCE DIRECTORY
+                </a>
+                <a asp-controller="Department" asp-action="Index" class="bg-white/5 hover:bg-white/10 text-white px-8 py-5 rounded-2xl font-black text-sm border border-white/10 transition-all flex items-center gap-3 group">
+                    <i data-lucide="building" class="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                    DIVISIONAL MANAGEMENT
+                </a>
+                <a asp-controller="Employee" asp-action="Create" class="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 px-8 py-5 rounded-2xl font-black text-sm shadow-xl transition-all flex items-center gap-3 transform hover:-translate-y-1">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    ONBOARD NEW TALENT
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- System & Faculty Management -->
+    <div class="space-y-10">
+        <div class="flex items-center justify-between">
+            <h2 class="text-3xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Directory & Access Control</h2>
+            <div class="flex gap-4">
+                 <a asp-action="CreateUser" class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-50 px-6 py-3 rounded-2xl font-black text-sm transition-all hover:bg-emerald-100 dark:hover:bg-emerald-500/20 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i>
+                    ADD EMPLOYEE
+                </a>
+                <button onclick="document.getElementById('add-instructor-form').classList.toggle('hidden')" class="bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 px-6 py-3 rounded-2xl font-black text-sm shadow-lg transition-all hover:scale-105 flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    ENROLL PROFESSOR
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Enrollment Card -->
+        <div id="add-instructor-form" class="hidden relative overflow-hidden bg-white dark:bg-emerald-950/20 rounded-4xl p-10 border border-emerald-900/5 dark:border-emerald-50/5 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-500">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Fast-Track Enrollment</h3>
+            </div>
+            <form asp-action="CreateInstructor" method="post" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest pl-2">Security ID / Username</label>
+                    <input type="text" name="username" placeholder="e.g. JBOLT" class="w-full bg-emerald-50 dark:bg-emerald-500/5 border-none rounded-2xl px-6 py-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all" required />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest pl-2">Access Key / Password</label>
+                    <input type="password" name="password" placeholder="••••••••" class="w-full bg-emerald-50 dark:bg-emerald-500/5 border-none rounded-2xl px-6 py-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all" required />
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-emerald-500 text-emerald-950 h-14 rounded-2xl font-black text-sm shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
+                        GENERATE PROFILE
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <!-- Faculty Directory -->
+            <div class="bg-white dark:bg-emerald-950/20 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium overflow-hidden">
+                <div class="p-8 border-b border-emerald-900/5 dark:border-emerald-50/5 flex items-center justify-between">
+                    <h3 class="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Faculty Hierarchy</h3>
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black rounded-full uppercase tracking-widest">Active Status</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-emerald-50/50 dark:bg-emerald-950/40">
+                            <tr>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Profile</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Classification</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest text-right">Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-emerald-900/5 dark:divide-emerald-50/5">
+                            @foreach (var instructor in Model.Instructors)
+                            {
+                                <tr class="hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 transition-colors">
+                                    <td class="px-8 py-6">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-2xl bg-emerald-900 dark:bg-emerald-500 flex items-center justify-center text-white dark:text-emerald-950 font-black text-xs shadow-lg">
+                                                @instructor.Username.Substring(0,1).ToUpper()
+                                            </div>
+                                            <span class="font-black text-emerald-950 dark:text-white">@instructor.Username</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <span class="px-3 py-1 bg-amber-500/10 text-amber-600 text-[9px] font-black rounded-full uppercase tracking-widest">PROFESSOR</span>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            <button onclick="openEditModal(@instructor.Id, '@instructor.Username')" class="p-2.5 rounded-xl text-emerald-900/40 hover:text-emerald-900 dark:text-emerald-50/40 dark:hover:text-white transition-all hover:scale-110">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </button>
+                                            <button onclick="confirmDelete(@instructor.Id, '@instructor.Username')" class="p-2.5 rounded-xl text-red-500/40 hover:text-red-500 transition-all hover:scale-110">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Workforce Directory -->
+            <div class="bg-white dark:bg-emerald-950/20 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium overflow-hidden">
+                <div class="p-8 border-b border-emerald-900/5 dark:border-emerald-50/5 flex items-center justify-between">
+                    <h3 class="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Organizational Staff</h3>
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black rounded-full uppercase tracking-widest">Active Status</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-emerald-50/50 dark:bg-emerald-950/40">
+                            <tr>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Identity</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Credential</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest text-right">Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-emerald-900/5 dark:divide-emerald-50/5">
+                            @foreach (var student in Model.Students)
+                            {
+                                <tr class="hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 transition-colors">
+                                    <td class="px-8 py-6">
+                                        <span class="font-black text-emerald-950 dark:text-white">@student.Username</span>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[9px] font-black rounded-full uppercase tracking-widest">@student.Role.ToUpper()</span>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            <button onclick="openEditModal(@student.Id, '@student.Username')" class="p-2.5 rounded-xl text-emerald-900/40 hover:text-emerald-900 dark:text-emerald-50/40 dark:hover:text-white transition-all hover:scale-110">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </button>
+                                            <button onclick="confirmDelete(@student.Id, '@student.Username')" class="p-2.5 rounded-xl text-red-500/40 hover:text-red-500 transition-all hover:scale-110">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Delete Modal -->
+<div id="delete-modal" class="fixed inset-0 z-[100] hidden transition-all duration-300" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-emerald-950/40 backdrop-blur-md transition-opacity" onclick="closeDeleteModal()"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-8 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-4xl bg-white dark:bg-emerald-950 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-900/10 dark:border-emerald-50/10">
+                <div class="p-10 text-center">
+                    <div class="w-20 h-20 mx-auto bg-red-50 dark:bg-red-500/10 rounded-3xl flex items-center justify-center mb-8">
+                        <i data-lucide="alert-octagon" class="w-10 h-10 text-red-500"></i>
+                    </div>
+                    <h3 class="text-3xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter mb-4">Confirm Deletion</h3>
+                    <p class="text-emerald-900/60 dark:text-emerald-50/60 text-sm font-bold leading-relaxed">
+                        Are you certain you want to remove <span id="delete-username" class="text-red-500"></span>? This will revoke all institutional access immediately.
+                    </p>
+                </div>
+                <div class="px-10 pb-10 flex flex-col sm:flex-row-reverse gap-4">
+                    <form id="delete-form" asp-action="DeleteUser" method="post" class="flex-1">
+                        <input type="hidden" name="id" id="delete-user-id" />
+                        <button type="submit" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02]">
+                            AUTHORIZE DELETE
+                        </button>
+                    </form>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-50 py-4 rounded-2xl font-black transition-all hover:bg-emerald-100">
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Edit User Modal -->
+<div id="edit-modal" class="fixed inset-0 z-[100] hidden transition-all duration-300" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-emerald-950/40 backdrop-blur-md transition-opacity" onclick="closeEditModal()"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-8 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-4xl bg-white dark:bg-emerald-950 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-900/10 dark:border-emerald-50/10">
+                <div class="p-10">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Modify Account</h3>
+                    </div>
+                    <form asp-action="EditUser" method="post" class="space-y-6">
+                        <input type="hidden" name="id" id="edit-user-id" />
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest pl-2">Security ID / Username</label>
+                            <input type="text" name="username" id="edit-username" class="w-full bg-emerald-50 dark:bg-emerald-500/5 border-none rounded-2xl px-6 py-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all" required />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest pl-2">Revised Access Key (Optional)</label>
+                            <input type="password" name="password" id="edit-password" placeholder="Leave blank to maintain current key" class="w-full bg-emerald-50 dark:bg-emerald-500/5 border-none rounded-2xl px-6 py-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all" />
+                        </div>
+                        <div class="flex gap-4 pt-4">
+                             <button type="submit" class="flex-1 bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 py-4 rounded-2xl font-black text-sm shadow-xl hover:scale-[1.02] transition-all">
+                                UPDATE CREDENTIALS
+                            </button>
+                            <button type="button" onclick="closeEditModal()" class="flex-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-50 py-4 rounded-2xl font-black transition-all hover:bg-emerald-100">
+                                ABORT
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(id, username) {
+        document.getElementById('delete-user-id').value = id;
+        document.getElementById('delete-username').textContent = username;
+        document.getElementById('delete-modal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+    }
+
+    function openEditModal(id, username) {
+        document.getElementById('edit-user-id').value = id;
+        document.getElementById('edit-username').value = username;
+        document.getElementById('edit-password').value = '';
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+</script>

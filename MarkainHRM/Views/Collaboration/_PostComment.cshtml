@@ -1,0 +1,162 @@
+@model OzarkLMS.Models.PostComment
+@{
+    var userIdClaim = ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? ViewContext.HttpContext.User.FindFirst("UserId");
+    var currentUserId = userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+    var userVote = Model.Votes?.FirstOrDefault(v => v.UserId == currentUserId)?.Value ?? 0;
+    var score = Model.UpvoteCount - Model.DownvoteCount;
+    var hasReplies = Model.Replies != null && Model.Replies.Any();
+    
+    // Depth tracking for chain flattening
+    var depth = ViewData["CommentDepth"] as int? ?? 0;
+    var nextDepth = depth + 1;
+    var isFlattened = depth >= 3; // Flatten after 3rd subchain
+    
+    // Collapse logic - show only first 2 replies by default
+    var maxVisibleReplies = 2;
+    var totalReplies = Model.Replies?.Count() ?? 0;
+    var hasMoreReplies = totalReplies > maxVisibleReplies;
+}
+
+<div class="group/comment flex gap-3 py-2 px-3 -mx-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all" id="comment-@Model.Id">
+    <!-- Left Column: Vertical Vote Controls -->
+    <div class="flex flex-col items-center pt-0.5 w-8 flex-shrink-0">
+        <!-- Upvote -->
+        <button onclick="voteComment(@Model.Id, 1, this)" 
+            class="transition-all p-1.5 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 @(userVote == 1 ? "text-orange-500" : "text-slate-300 dark:text-slate-600 hover:text-orange-500")"
+            aria-label="Upvote">
+            <i data-lucide="chevron-up" class="w-4 h-4"></i>
+        </button>
+        
+        <!-- Score -->
+        <span class="comment-like-count text-xs font-bold @(userVote == 1 ? "text-orange-500" : userVote == -1 ? "text-blue-500" : "text-slate-500 dark:text-slate-500")" 
+            data-comment-id="@Model.Id">@score</span>
+        
+        <!-- Downvote -->
+        <button onclick="voteComment(@Model.Id, -1, this)" 
+            class="transition-all p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 @(userVote == -1 ? "text-blue-500" : "text-slate-300 dark:text-slate-600 hover:text-blue-500")"
+            aria-label="Downvote">
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Right Column: Content -->
+    <div class="flex-1 min-w-0">
+        <!-- Comment Header -->
+        <div class="flex items-center gap-2 mb-1.5">
+            <!-- Avatar -->
+            <a asp-controller="Account" asp-action="Profile" asp-route-userId="@Model.UserId" class="cursor-pointer group/avatar">
+                @if(Model.User != null && !string.IsNullOrEmpty(Model.User.ProfilePictureUrl))
+                {
+                    <img src="@(Model.User.ProfilePictureUrl + (Model.User.ProfilePictureUrl.Contains("?") ? "&" : "?") + "v=" + DateTime.UtcNow.Ticks)" class="w-7 h-7 rounded-lg object-cover shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 group-hover/avatar:ring-[#004B87] transition-all" alt="Avatar" />
+                }
+                else
+                {
+                    <div class="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-400 shadow-sm">
+                        @((Model.User?.Username ?? "?").Substring(0,1).ToUpper())
+                    </div>
+                }
+            </a>
+            
+            <!-- Username & Timestamp -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <a asp-controller="Account" asp-action="Profile" asp-route-userId="@Model.UserId" class="font-semibold text-sm text-slate-700 dark:text-slate-200 hover:text-[#004B87] dark:hover:text-blue-400 transition-colors">@(Model.User?.Username ?? "Unknown")</a>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500">@Model.CreatedAt.ToLocalTime().ToString("MMM dd, HH:mm")</span>
+            </div>
+        </div>
+
+        <!-- Comment Content -->
+        <div id="comment-content-@Model.Id" class="text-sm text-slate-600 dark:text-slate-300 mb-2 whitespace-pre-wrap leading-relaxed">@Model.Content</div>
+
+        <!-- Actions Row -->
+        <div class="flex items-center gap-1 text-xs opacity-60 group-hover/comment:opacity-100 transition-opacity">
+            <!-- Reply Button -->
+            <button onclick="toggleReplyForm(@Model.Id)" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-[#004B87] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-medium">
+                <i data-lucide="reply" class="w-3.5 h-3.5"></i>
+                Reply
+            </button>
+            
+            <!-- Author Actions -->
+            @if(Model.UserId == currentUserId)
+            {
+                <button onclick="toggleEditComment(@Model.Id)" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all font-medium">
+                    <i data-lucide="pencil" class="w-3 h-3"></i>
+                    Edit
+                </button>
+                <button onclick="deleteComment(@Model.Id)" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    Delete
+                </button>
+            }
+
+            <!-- Collapse Button -->
+            <button onclick="toggleCommentThread(@Model.Id)" 
+                class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-[#004B87] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all font-medium @(hasReplies ? "" : "hidden")"
+                id="collapse-btn-@Model.Id">
+                <i data-lucide="@(hasReplies ? "minus" : "plus")" class="w-3 h-3"></i>
+                <span id="collapse-text-@Model.Id">@(hasReplies ? "Hide" : "Show") Replies</span>
+            </button>
+        </div>
+
+        <!-- Reply Form (Hidden) -->
+        <div id="reply-form-@Model.Id" class="hidden mt-3 flex items-center gap-2 animate-in slide-in-from-top-2 duration-150">
+            <input id="reply-input-@Model.Id" 
+                type="text" 
+                class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#004B87] dark:focus:ring-blue-500 shadow-sm transition-all" 
+                placeholder="Write a reply..." 
+                onkeydown="if(event.key === 'Enter') submitComment(@Model.PostId, @Model.Id)" />
+            <button onclick="submitComment(@Model.PostId, @Model.Id)" 
+                class="p-2 bg-[#004B87] text-white rounded-xl hover:bg-[#003d6b] hover:shadow-lg transition-all">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Edit Form (Hidden) -->
+        <div id="edit-form-@Model.Id" class="hidden mt-3 animate-in slide-in-from-top-2 duration-150">
+            <textarea id="edit-input-@Model.Id" rows="2" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#004B87] shadow-sm transition-all" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submitEditComment(@Model.Id); }">@Model.Content</textarea>
+            <div class="flex justify-end gap-2 mt-2">
+                <button onclick="toggleEditComment(@Model.Id)" class="px-4 py-2 text-sm text-slate-500 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all">Cancel</button>
+                <button onclick="submitEditComment(@Model.Id)" class="px-4 py-2 text-sm bg-[#004B87] text-white rounded-lg font-medium shadow-sm hover:bg-[#003d6b] hover:shadow-md transition-all">Save</button>
+            </div>
+        </div>
+
+        <!-- Nested Replies Container -->
+        @if(hasReplies)
+        {
+            <!-- Container: use left border + indent for depth < 3, no indent for depth >= 3 -->
+            <div id="replies-@Model.Id" class="mt-3 @(isFlattened ? "" : "pl-3 border-l-2 border-slate-200 dark:border-slate-700") space-y-1">
+                @{
+                    var repliesList = Model.Replies.OrderBy(r => r.CreatedAt).ToList();
+                    var visibleReplies = repliesList.Take(maxVisibleReplies);
+                    var hiddenReplies = repliesList.Skip(maxVisibleReplies);
+                }
+                
+                @foreach(var reply in visibleReplies)
+                {
+                    var replyViewData = new ViewDataDictionary(ViewData) { ["CommentDepth"] = nextDepth };
+                    <partial name="~/Views/Collaboration/_PostComment.cshtml" model="reply" view-data="replyViewData" />
+                }
+                
+                @if(hasMoreReplies)
+                {
+                    <!-- View More Button -->
+                    <div id="view-more-@Model.Id" class="py-2">
+                        <button onclick="showMoreReplies(@Model.Id)" 
+                            class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#004B87] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            View @(totalReplies - maxVisibleReplies) more @(totalReplies - maxVisibleReplies == 1 ? "reply" : "replies")
+                        </button>
+                    </div>
+                    
+                    <!-- Hidden Replies -->
+                    <div id="hidden-replies-@Model.Id" class="hidden space-y-1">
+                        @foreach(var reply in hiddenReplies)
+                        {
+                            var replyViewData2 = new ViewDataDictionary(ViewData) { ["CommentDepth"] = nextDepth };
+                            <partial name="~/Views/Collaboration/_PostComment.cshtml" model="reply" view-data="replyViewData2" />
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

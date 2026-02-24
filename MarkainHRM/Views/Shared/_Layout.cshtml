@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Markain Management System</title>
+    @inject OzarkLMS.Data.AppDbContext _context
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        markain: {
+                            bone: '#FDFCFB',
+                            glass: 'rgba(255, 255, 255, 0.7)',
+                            'glass-dark': 'rgba(2, 44, 34, 0.7)',
+                            emerald: {
+                                900: '#064e3b',
+                                950: '#022c22',
+                            },
+                        },
+                        amber: {
+                            600: '#D97706',
+                        }
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                    },
+                    boxShadow: {
+                        'premium': '0 20px 50px -12px rgba(6, 78, 59, 0.08)',
+                        'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
+        }
+
+        // Critical: Apply theme immediately to prevent flash
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+        .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        .dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Natural transitions */
+        .transition-all-300 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        html.dark { background-color: #022c22; }
+    </style>
+</head>
+<body class="bg-markain-bone dark:bg-markain-emerald-950 text-emerald-900 dark:text-emerald-50 font-sans min-h-screen transition-colors duration-300">
+    @{
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var hasUnread = false;
+        string? userProfilePic = null;
+
+        if(currentUserId != null) {
+                var uid = int.Parse(currentUserId);
+                // Check for unread notifications
+                hasUnread = _context.Notifications.Any(n => n.RecipientId == uid && !n.IsRead);
+                
+                // Fetch profile pic
+                var currentUser = _context.Users.Find(uid);
+                if(currentUser != null) 
+                {
+                    userProfilePic = currentUser.ProfilePictureUrl;
+                }
+        }
+    }
+    
+    <div class="w-full flex flex-col min-h-screen bg-markain-bone dark:bg-markain-emerald-950 transition-colors duration-300">
+        <!-- Top Navigation Bar (Floating Glass) -->
+        <header class="sticky top-0 z-50 transition-all-300 glass-header bg-markain-glass dark:bg-markain-glass-dark border-b border-emerald-900/10 dark:border-emerald-50/10 shadow-premium dark:shadow-premium-dark">
+            <div class="max-w-[1800px] mx-auto px-6 lg:px-12">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Logo and Brand (Left Column) -->
+                    <div class="flex-1 flex items-center">
+                        <div class="flex items-center group cursor-pointer" onclick="window.location.href='/'">
+                             <div class="relative">
+                                 <img src="/images/logo.jpg" asp-append-version="true" alt="Markain Management System Logo" class="h-11 w-auto object-contain rounded-xl transition-transform group-hover:scale-110 duration-500 shadow-sm" />
+                                 <div class="absolute -inset-2 bg-emerald-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             </div>
+                             <div class="ml-4 flex flex-col justify-center hidden md:flex">
+                                 <h1 class="font-black text-2xl tracking-tight leading-none text-emerald-950 dark:text-white">MARKAIN</h1>
+                                 <p class="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-[0.3em] leading-none mt-1">MANAGEMENT SYSTEM</p>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop Navigation (Centered Column) -->
+                    <nav class="hidden xl:flex items-center space-x-1">
+                         <a asp-controller="Home" asp-action="Index" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                            Dashboard
+                         </a>
+                         <a asp-controller="Courses" asp-action="Index" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                            Training
+                         </a>
+                         @if (User.IsInRole("admin"))
+                         {
+                             <a asp-controller="Admin" asp-action="Dashboard" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                                Admin
+                             </a>
+                         }
+                         <a asp-controller="Recruitment" asp-action="Index" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                            Careers
+                         </a>
+                         @if (User.IsInRole("admin"))
+                         {
+                             <a asp-controller="Recruitment" asp-action="AdminDashboard" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                                ATS
+                             </a>
+                         }
+                         <a asp-controller="Calendar" asp-action="Index" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                            Schedule
+                         </a>
+                         <a asp-controller="PDFToolbox" asp-action="Index" class="text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-900 dark:hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all-300 flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
+                            PDF Pro
+                         </a>
+                         <a asp-controller="Collaboration" asp-action="Index" class="ml-2 bg-emerald-900 dark:bg-emerald-500 text-white dark:text-emerald-950 px-5 py-2.5 rounded-2xl text-sm font-black transition-all-300 flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95">
+                            <i data-lucide="zap" class="w-4 h-4 fill-current"></i> HUB
+                         </a>
+                    </nav>
+
+                    <!-- Right Side: Control Center (Right Column) -->
+                    <div class="flex-1 flex items-center justify-end gap-3">
+                        <div class="hidden lg:flex flex-col items-end mr-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-900/40 dark:text-emerald-50/40">SYSTEM ACCESS</span>
+                            <span class="text-sm font-black text-emerald-950 dark:text-white uppercase tracking-tighter">@User.Identity?.Name</span>
+                        </div>
+
+                        <!-- Theme Toggle -->
+                        <button onclick="toggleDarkMode()" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-950 dark:hover:text-white border border-emerald-900/5 dark:border-emerald-50/5 transition-all-300 group">
+                            <i data-lucide="moon" class="w-5 h-5 hidden dark:block group-hover:scale-110 transition-transform"></i>
+                            <i data-lucide="sun" class="w-5 h-5 block dark:hidden group-hover:scale-110 transition-transform"></i>
+                        </button>
+                        
+                        <!-- Notifications -->
+                        <div class="relative" id="notification-container">
+                            <button onclick="toggleNotificationDropdown()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-950 dark:hover:text-white border border-emerald-900/5 dark:border-emerald-50/5 relative transition-all-300 group">
+                                <i data-lucide="bell-ring" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                                @if(hasUnread)
+                                {
+                                    <span class="absolute top-3 right-3 w-2 h-2 bg-amber-600 rounded-full border-2 border-white dark:border-emerald-950 animate-pulse"></span>
+                                }
+                            </button>
+
+                            <!-- Dropdown Panel -->
+                            <div id="notification-dropdown" class="hidden absolute right-0 mt-4 w-96 bg-white dark:bg-emerald-950 rounded-3xl shadow-premium dark:shadow-premium-dark border border-emerald-900/10 dark:border-emerald-50/10 z-50 overflow-hidden origin-top-right transition-all duration-300">
+                                <!-- Header -->
+                                <div class="px-6 py-4 border-b border-emerald-900/5 dark:border-emerald-50/5 flex items-center justify-between bg-emerald-50/20 dark:bg-emerald-500/5">
+                                    <h3 class="font-black text-emerald-950 dark:text-white text-sm tracking-tight">Notifications</h3>
+                                    <div class="flex items-center gap-2">
+                                        @if(hasUnread || _context.Notifications.Any(n => n.RecipientId == int.Parse(currentUserId ?? "0")))
+                                        {
+                                            <button onclick="clearAllNotifications()" class="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 transition-colors">
+                                                Clear All
+                                            </button>
+                                        }
+                                        <a asp-controller="Notification" asp-action="Index" class="text-emerald-900/40 hover:text-emerald-900 dark:text-emerald-50/40 dark:hover:text-white transition-colors p-1" title="Full Screen">
+                                            <i data-lucide="maximize" class="w-4 h-4"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- List -->
+                                <div id="dropdown-notification-list" class="max-h-[400px] overflow-y-auto p-2">
+                                    <div class="flex justify-center py-4">
+                                        <div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="bg-gray-50 dark:bg-slate-950 p-2 text-center border-t border-gray-100 dark:border-slate-800">
+                                    <a asp-controller="Notification" asp-action="Index" class="text-xs font-semibold text-[#004B87] dark:text-blue-400 hover:underline">View All Notifications</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Dropdown -->
+                        <div class="relative group" id="user-menu-container">
+                            <button onclick="document.getElementById('user-dropdown').classList.toggle('hidden')" class="flex p-0.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 hover:scale-105 transition-all duration-300">
+                                <div class="h-10 w-10 rounded-2xl overflow-hidden border-2 border-emerald-400 bg-emerald-900 flex items-center justify-center text-white font-black text-sm">
+                                    @if(!string.IsNullOrEmpty(userProfilePic))
+                                    {
+                                        <img src="@userProfilePic" alt="User" class="w-full h-full object-cover" />
+                                    }
+                                    else
+                                    {
+                                        @(User.Identity?.Name?.Substring(0,1) ?? "U")
+                                    }
+                                </div>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-4 w-56 bg-white dark:bg-emerald-950 rounded-3xl shadow-premium dark:shadow-premium-dark border border-emerald-900/10 dark:border-emerald-50/10 py-3 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                <div class="px-6 py-4 border-b border-emerald-900/5 dark:border-emerald-50/5">
+                                    <p class="text-sm font-black text-emerald-950 dark:text-white tracking-tight">@User.Identity?.Name</p>
+                                    <p class="text-[10px] font-bold text-emerald-950/40 dark:text-emerald-50/40 uppercase tracking-widest mt-0.5 truncate">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
+                                </div>
+                                <div class="p-2 space-y-1">
+                                    <a asp-controller="Account" asp-action="Profile" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-emerald-950/70 dark:text-emerald-50/70 hover:text-emerald-950 dark:hover:text-white hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-2xl transition-all-300">
+                                        <i data-lucide="user-circle" class="w-4 h-4"></i> Profile
+                                    </a>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="block">
+                                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all-300">
+                                            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu Button (Optional, simple implementation) -->
+            <!-- We could add a mobile menu here if requested, but for now focusing on desktop top nav -->
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-1 relative flex flex-col pt-0">
+            <main class="flex-1">
+                @RenderBody()
+            </main>
+            
+            <footer class="mt-auto py-4 px-8 text-center text-xs text-slate-400 border-t border-gray-200 dark:border-slate-800">
+                &copy; 2026 Markain
+            </footer>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // --- Notification Dropdown Logic ---
+        let isDropdownOpen = false;
+
+        async function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notification-dropdown');
+            const listContainer = document.getElementById('dropdown-notification-list');
+            
+            if (dropdown.classList.contains('hidden')) {
+                // Open
+                dropdown.classList.remove('hidden');
+                isDropdownOpen = true;
+                
+                // Fetch Content
+                try {
+                    const res = await fetch('/Notification/GetDropdownPartial');
+                    if (res.ok) {
+                        const html = await res.text();
+                        listContainer.innerHTML = html;
+                        lucide.createIcons(); // Re-init icons
+                    }
+                } catch (e) {
+                    listContainer.innerHTML = '<p class="text-center text-red-500 text-sm py-4">Failed to load.</p>';
+                }
+            } else {
+                // Close
+                dropdown.classList.add('hidden');
+                isDropdownOpen = false;
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('notification-container');
+            const dropdown = document.getElementById('notification-dropdown');
+            
+            if (isDropdownOpen && container && !container.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                isDropdownOpen = false;
+            }
+        });
+
+        // Shared Notification Logic (Used by both Index and Dropdown)
+        function toggleNoteDelete(e, id, show) {
+            e.stopPropagation();
+            const btns = document.querySelectorAll(`.del-btn-${id}`);
+            const confirms = document.querySelectorAll(`.del-confirm-${id}`);
+            
+            if(show) {
+                btns.forEach(el => el.classList.add('hidden'));
+                confirms.forEach(el => el.classList.remove('hidden'));
+            } else {
+                btns.forEach(el => el.classList.remove('hidden'));
+                confirms.forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        async function deleteNotification(e, id) {
+            e.stopPropagation();
+            try {
+                const res = await fetch(`/Notification/Delete/${id}`, { method: 'POST' });
+                if(res.ok) {
+                    const elements = document.querySelectorAll(`.note-${id}`);
+                    elements.forEach(el => {
+                        el.style.opacity = '0';
+                        setTimeout(() => el.remove(), 300);
+                    });
+                    
+                    // Check if list empty in main view
+                    setTimeout(() => {
+                         const list = document.getElementById('notification-list');
+                         if(list && list.children.length <= 1) location.reload();
+                    }, 350);
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function handleNotificationClick(id, url) {
+            try {
+                await fetch(`/Notification/MarkRead/${id}`, { method: 'POST' });
+                // Remove red dots
+                document.querySelectorAll(`.dot-${id}`).forEach(el => el.remove());
+                // Dim the items
+                document.querySelectorAll(`.note-${id}`).forEach(el => {
+                     el.classList.add('opacity-75');
+                     el.classList.remove('bg-blue-50/10', 'dark:bg-blue-900/10');
+                });
+            } catch(e) { console.error(e); }
+
+            if (url && url !== "") {
+                window.location.href = url;
+            } else {
+                // If just marking read, reload current page to update badges/lists
+                // Or just let the DOM updates stand
+            }
+        }
+
+        // --- Clear All Logic ---
+        function clearAllNotifications() {
+             const modal = document.getElementById('clearNotificationsModal');
+             if(modal) {
+                 modal.classList.remove('hidden');
+             }
+        }
+
+        function closeClearNotificationsModal() {
+             const modal = document.getElementById('clearNotificationsModal');
+             if(modal) {
+                 modal.classList.add('hidden');
+             }
+        }
+
+        async function proceedClearNotifications() {
+             try {
+                const res = await fetch(`/Notification/ClearAll`, { method: 'POST' });
+                if(res.ok) {
+                    location.reload();
+                }
+            } catch(e) { console.error(e); }
+        }    </script>
+    
+    <!-- Global Modals (Feed/Profile) -->
+    
+    <!-- Clear All Notifications Modal -->
+    <div id="clearNotificationsModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+             <div class="text-center">
+                <div class="bg-red-100 dark:bg-red-900/30 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="bell-off" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">Clear All Notifications?</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Are you sure you want to clear all notifications? This action cannot be undone.</p>
+                
+                <div class="flex justify-center space-x-3">
+                    <button type="button" onclick="closeClearNotificationsModal()" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancel</button>
+                    <button type="button" onclick="proceedClearNotifications()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg shadow-md transition-colors">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

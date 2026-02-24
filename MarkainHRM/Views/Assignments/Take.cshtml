@@ -1,0 +1,335 @@
+@model OzarkLMS.Models.Assignment
+
+@{
+    ViewData["Title"] = Model.Type == "quiz" ? "Take Quiz" : "Submit Assignment";
+    bool isQuiz = Model.Type == "quiz";
+    var existingSubmission = ViewBag.ExistingSubmission as OzarkLMS.Models.Submission;
+}
+
+@if (TempData["ShowSubmissionBanner"] != null)
+{
+    <div id="submission-banner" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-8 py-4 rounded-full shadow-2xl z-50 flex items-center animate-bounce">
+        <i data-lucide="check-circle" class="w-6 h-6 mr-3"></i>
+        <span class="font-bold text-lg">Assignment Submitted Successfully!</span>
+    </div>
+    <script>
+        setTimeout(function() {
+            var banner = document.getElementById('submission-banner');
+            if(banner) {
+                banner.style.transition = "opacity 0.5s";
+                banner.style.opacity = "0";
+                setTimeout(() => banner.remove(), 500);
+            }
+        }, 3000);
+    </script>
+}
+
+<div class="p-8 max-w-[800px] mx-auto">
+    <div class="mb-6">
+        <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" asp-route-tab="assignments" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-[#004B87] dark:hover:text-blue-400 transition-colors flex items-center mb-4">
+             <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Course
+        </a>
+        <h1 class="text-2xl font-bold text-[#004B87] dark:text-blue-400">@Model.Title</h1>
+        <div class="flex items-center space-x-4 mt-2 text-sm text-slate-500 dark:text-slate-400">
+             <span>Due: @Model.DueDate.ToShortDateString()</span>
+             <span>•</span>
+             <span>@Model.MaxAttempts Attempts</span>
+        </div>
+        
+        @if(!string.IsNullOrEmpty(Model.Description))
+        {
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800 text-slate-700 dark:text-slate-300">
+                <h3 class="font-bold text-[#004B87] dark:text-blue-400 mb-2 text-sm uppercase">Instructions</h3>
+                <p class="whitespace-pre-wrap">@Model.Description</p>
+                
+                @if(!string.IsNullOrEmpty(Model.AttachmentUrl))
+                {
+                    <div class="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+                        <a href="@Model.AttachmentUrl" target="_blank" class="inline-flex items-center text-[#004B87] dark:text-blue-400 font-bold hover:underline">
+                            <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download Attached Document
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if (existingSubmission != null)
+    {
+        <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-8 mb-8">
+            <h2 class="text-xl font-bold text-emerald-800 dark:text-emerald-400 mb-4 flex items-center">
+                <i data-lucide="check-circle" class="w-6 h-6 mr-2"></i> You have submitted this assignment
+            </h2>
+            <div class="space-y-2 text-emerald-900 dark:text-emerald-300">
+                <p><strong>Submitted At:</strong> @existingSubmission.SubmittedAt.ToLocalTime()</p>
+                
+                @if(!string.IsNullOrEmpty(existingSubmission.Content))
+                {
+                    <div class="bg-white/50 dark:bg-slate-800/50 p-4 rounded-lg mt-2">
+                        <strong class="block text-xs uppercase text-emerald-600 dark:text-emerald-400 mb-1">Text Submission:</strong>
+                        <p>@existingSubmission.Content</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(existingSubmission.AttachmentUrl))
+                {
+                    <div class="mt-4">
+                        <a href="@existingSubmission.AttachmentUrl" target="_blank" class="inline-flex items-center bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 px-4 py-2 rounded-lg font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors shadow-sm">
+                            <i data-lucide="download" class="w-5 h-5 mr-2"></i> Download Submitted File
+                        </a>
+                    </div>
+                }
+                
+                @if (existingSubmission.Score.HasValue)
+                {
+                    <div class="mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-800">
+                        <p><strong>Score:</strong> <span class="bg-emerald-200 dark:bg-emerald-800/50 px-2 py-1 rounded text-emerald-800 dark:text-emerald-300 font-bold">@existingSubmission.Score / @Model.Points</span></p>
+                        @if (!string.IsNullOrEmpty(existingSubmission.Feedback))
+                        {
+                            <p class="mt-2 text-sm"><strong class="text-emerald-700 dark:text-emerald-400">Feedback:</strong> @existingSubmission.Feedback</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (isQuiz)
+    {
+        <form asp-action="SubmitQuiz" method="post" class="space-y-8">
+            <input type="hidden" name="assignmentId" value="@Model.Id" />
+            
+            @foreach (var (question, index) in Model.Questions.Select((q, i) => (q, i)))
+            {
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-gray-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm mr-4 flex-shrink-0">@(index + 1)</span>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">@question.Text</h3>
+                            <p class="text-xs text-slate-400 mt-1">@question.Points Points</p>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-12 space-y-3">
+                        @foreach (var option in question.Options)
+                        {
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-gray-200 dark:hover:border-slate-600 transition-all">
+                                <input type="radio" name="answers[@question.Id]" value="@option.Id" class="w-5 h-5 text-[#004B87] dark:text-blue-500 focus:ring-[#004B87] dark:focus:ring-blue-500 bg-gray-100 dark:bg-slate-700 border-gray-300 dark:border-slate-600" required />
+                                <span class="text-slate-700 dark:text-slate-300">@option.Text</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+            
+            <div class="pt-6 border-t border-gray-100 dark:border-slate-700 flex justify-end">
+                <button type="submit" class="bg-[#004B87] dark:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-[#003d6e] dark:hover:bg-blue-700 shadow-lg shadow-blue-900/20 text-lg transition-colors">
+                    Submit Quiz
+                </button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <!-- Quill Styles -->
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <style>
+            /* Custom Quill Styles for Dark Mode */
+            .ql-toolbar {
+                border-top-left-radius: 0.5rem;
+                border-top-right-radius: 0.5rem;
+                background-color: #f8fafc; /* slate-50 */
+                border-color: #e2e8f0; /* slate-200 */
+            }
+            .dark .ql-toolbar {
+                background-color: #1e293b; /* slate-800 */
+                border-color: #475569; /* slate-600 */
+                color: #e2e8f0;
+            }
+            .dark .ql-toolbar .ql-stroke {
+                stroke: #e2e8f0;
+            }
+            .dark .ql-toolbar .ql-fill {
+                fill: #e2e8f0;
+            }
+            .dark .ql-toolbar .ql-picker {
+                color: #e2e8f0;
+            }
+            
+            .ql-container {
+                border-bottom-left-radius: 0.5rem;
+                border-bottom-right-radius: 0.5rem;
+                border-color: #e2e8f0; /* slate-200 */
+                font-family: inherit;
+                font-size: 1rem;
+            }
+            .dark .ql-container {
+                background-color: #0f172a; /* slate-900 */
+                border-color: #475569; /* slate-600 */
+                color: #f1f5f9; /* slate-100 */
+            }
+            .ql-editor {
+                min-height: 200px;
+            }
+        </style>
+
+        <form asp-action="SubmitAssignment" method="post" enctype="multipart/form-data" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8">
+            <input type="hidden" name="assignmentId" value="@Model.Id" />
+            
+            <!-- Text Submission Section - Always Visible -->
+            <div class="mb-8">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Comments</label>
+                <div id="editor-container"></div>
+                <input type="hidden" name="content" id="hidden-content">
+            </div>
+
+            <!-- File Upload Section - Always Visible -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">Files to submit</label>
+                    <span id="file-count" class="text-sm text-slate-500 dark:text-slate-400">(0) file(s) to submit</span>
+                </div>
+                
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">After uploading, you must click Submit to complete the submission.</p>
+
+                <input type="file" name="files" id="file-input" multiple class="hidden" />
+                
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <button type="button" id="add-file-btn" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                        <i data-lucide="file-plus" class="w-4 h-4 mr-2"></i>
+                        Add a File
+                    </button>
+                </div>
+
+                <!-- File List -->
+                <div id="file-list" class="space-y-2">
+                    <!-- Files will be added here via JS -->
+                </div>
+            </div>
+
+            <div class="pt-4 flex justify-end space-x-4">
+                 <button type="button" onclick="history.back()" class="px-6 py-2 rounded-lg font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" id="submit-btn" class="bg-[#004B87] dark:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-[#003d6e] dark:hover:bg-blue-700 shadow-lg shadow-blue-900/20 transition-all transform active:scale-95">
+                    Submit Assignment
+                </button>
+            </div>
+        </form>
+
+        <!-- Scripts for Editor and File Upload -->
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <script>
+            // Initialize Quill
+            var quill = new Quill('#editor-container', {
+                theme: 'snow',
+                placeholder: 'Type your submission here...',
+                modules: {
+                    toolbar: [
+                        [{ 'font': [] }],
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // Handle Form Submission
+            document.querySelector('form').addEventListener('submit', function(e) {
+                // Sync Quill content
+                var contentInput = document.getElementById('hidden-content');
+                if (contentInput) {
+                    contentInput.value = quill.root.innerHTML;
+                }
+                
+                // Add loading state
+                var btn = document.getElementById('submit-btn');
+                btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-5 h-5 mr-2 inline"></i> Submitting...';
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            });
+
+            // File Upload Logic
+            const fileInput = document.getElementById('file-input');
+            const fileList = document.getElementById('file-list');
+            const addFileBtn = document.getElementById('add-file-btn');
+            const fileCount = document.getElementById('file-count');
+            
+            // Using a DataTransfer to manage the file list (allows removing files)
+            const dt = new DataTransfer();
+
+            if (fileInput && addFileBtn) {
+                // Click "Add a File" button to open file picker
+                addFileBtn.addEventListener('click', function() {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', function(e) {
+                    for(let i = 0; i < this.files.length; i++){
+                        dt.items.add(this.files[i]);
+                    }
+                    this.files = dt.files; // Update input files
+                    updateFileList();
+                    updateFileCount();
+                });
+            }
+
+            function updateFileCount() {
+                if (fileCount) {
+                    const count = dt.files.length;
+                    fileCount.textContent = `(${count}) file(s) to submit`;
+                }
+            }
+
+            function updateFileList() {
+                if (!fileList) return;
+                
+                fileList.innerHTML = '';
+                
+                for (let i = 0; i < dt.files.length; i++) {
+                    const file = dt.files[i];
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800';
+                    div.innerHTML = `
+                        <div class="flex items-center overflow-hidden">
+                            <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded mr-3 flex-shrink-0">
+                                <i data-lucide="file-text" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="truncate">
+                                <p class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">${file.name}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${formatBytes(file.size)}</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeFile(${i})" class="text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    `;
+                    fileList.appendChild(div);
+                }
+                lucide.createIcons();
+            }
+
+            window.removeFile = function(index) {
+                dt.items.remove(index);
+                fileInput.files = dt.files;
+                updateFileList();
+                updateFileCount();
+            }
+
+            function formatBytes(bytes, decimals = 2) {
+                if (!+bytes) return '0 Bytes';
+                const k = 1024;
+                const dm = decimals < 0 ? 0 : decimals;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+            }
+        </script>
+    }
+</div>

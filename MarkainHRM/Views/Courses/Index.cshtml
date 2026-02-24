@@ -1,0 +1,139 @@
+@model IEnumerable<OzarkLMS.Models.Course>
+
+<div class="p-6 lg:p-12 max-w-[1700px] mx-auto space-y-12">
+    <!-- Sophisticated Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="space-y-2">
+            <span class="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600">Enterprise Learning</span>
+            <h1 class="text-5xl md:text-6xl font-black text-emerald-950 dark:text-white tracking-tighter leading-none">
+                Training <span class="text-emerald-500">&</span> Compliance
+            </h1>
+        </div>
+        
+        <div class="flex items-center gap-4">
+             <div class="relative group">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-900/40 dark:text-emerald-50/40 group-focus-within:text-emerald-500 transition-colors"></i>
+                <input type="text" placeholder="Search modules..." class="bg-white dark:bg-emerald-950/20 border border-emerald-900/5 dark:border-emerald-50/5 pl-12 pr-6 py-4 rounded-2xl w-full md:w-80 font-bold text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none shadow-sm transition-all" />
+            </div>
+
+            @if(User.IsInRole("admin") || User.IsInRole("instructor"))
+            {
+                <a asp-action="Create" class="bg-emerald-900 dark:bg-emerald-500 text-white dark:text-emerald-950 px-8 py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/10 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    NEW MODULE
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="bg-white/50 dark:bg-emerald-900/10 backdrop-blur-sm rounded-4xl border-2 border-dashed border-emerald-900/5 dark:border-emerald-50/5 p-32 text-center">
+            <i data-lucide="book" class="w-16 h-16 text-emerald-900/10 mx-auto mb-6"></i>
+            <p class="text-xl font-bold text-emerald-900/40 dark:text-emerald-50/40">The library is currently being curated.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            @foreach (var course in Model)
+            {
+                <div class="group relative bg-white dark:bg-emerald-950/20 rounded-2xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col min-h-[320px]">
+                    <a asp-action="Details" asp-route-id="@course.Id" class="absolute inset-0 z-0"></a>
+                    
+
+                    <div class="p-10 flex-1 flex flex-col relative z-10 pointer-events-none">
+                        <div class="flex justify-between items-start mb-6 pointer-events-auto">
+                            <span class="px-4 py-1 rounded-full bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-900/60 dark:text-emerald-50/60 text-[10px] font-black uppercase tracking-widest border border-emerald-900/5 dark:border-emerald-50/5">@course.Code</span>
+                            
+                            <div class="flex gap-2">
+                                @if(User.IsInRole("admin") || User.IsInRole("instructor"))
+                                {
+                                    <a asp-action="ManageStudents" asp-route-id="@course.Id" class="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-900/60 dark:text-emerald-50/60 hover:text-emerald-950 dark:hover:text-white transition-all hover:scale-110" title="Manage Employees">
+                                        <i data-lucide="users" class="w-4 h-4"></i>
+                                    </a>
+                                }
+                                @if(User.IsInRole("admin") || (User.IsInRole("instructor") && course.InstructorId == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0")))
+                                {
+                                    <button onclick="openDeleteModal(@course.Id, '@course.Name')" class="p-2.5 rounded-xl bg-red-50/50 dark:bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:scale-110" title="Delete Module">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <h3 class="text-3xl font-black text-emerald-950 dark:text-white tracking-tight leading-tight mb-4 group-hover:text-emerald-500 transition-colors">
+                            @course.Name
+                        </h3>
+                        
+                        <p class="text-emerald-900/40 dark:text-emerald-50/40 text-sm font-bold uppercase tracking-tighter mb-8">@course.Term Perspective</p>
+
+                        <div class="mt-auto flex items-center justify-between pointer-events-auto pt-6 border-t border-emerald-900/5 dark:border-emerald-50/5">
+                             @if(course.Instructor != null)
+                             {
+                                 <div class="flex items-center gap-3">
+                                     <div class="w-10 h-10 rounded-2xl bg-emerald-900 dark:bg-emerald-500 flex items-center justify-center text-white dark:text-emerald-950 font-black text-sm shadow-lg">
+                                         @(course.Instructor.Username.Substring(0,1).ToUpper())
+                                     </div>
+                                     <div class="flex flex-col">
+                                         <span class="text-[9px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Instructor</span>
+                                         <span class="text-xs font-black text-emerald-950 dark:text-white">@course.Instructor.Username</span>
+                                     </div>
+                                 </div>
+                             }
+                             <div class="text-emerald-900/20 group-hover:text-emerald-500 group-hover:translate-x-2 transition-all duration-300">
+                                <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Modern Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 z-[100] hidden transition-all duration-300" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-emerald-950/40 backdrop-blur-md transition-opacity" onclick="closeDeleteModal()"></div>
+    
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-8 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-4xl bg-white dark:bg-emerald-950 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-900/10 dark:border-emerald-50/10">
+                <div class="p-10">
+                    <div class="flex items-center justify-center w-20 h-20 mx-auto bg-red-50 dark:bg-red-500/10 rounded-3xl mb-8">
+                        <i data-lucide="alert-octagon" class="w-10 h-10 text-red-500"></i>
+                    </div>
+                    <div class="text-center space-y-4">
+                        <h3 class="text-3xl font-black text-emerald-950 dark:text-white tracking-tighter uppercase" id="modal-title">Confirm Deletion</h3>
+                        <p class="text-emerald-900/60 dark:text-emerald-50/60 text-sm font-bold leading-relaxed">
+                            You are about to remove <span id="deleteCourseName" class="text-red-500"></span> from the enterprise catalog. This action will disrupt all active enrollments.
+                        </p>
+                    </div>
+                </div>
+                <div class="px-10 pb-10 flex flex-col sm:flex-row-reverse gap-4">
+                    <form asp-action="Delete" method="post" class="flex-1">
+                        <input type="hidden" id="deleteCourseId" name="id" value="" />
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-95">
+                            EXECUTE DELETE
+                        </button>
+                    </form>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-50 py-4 rounded-2xl font-black transition-all hover:bg-emerald-100 dark:hover:bg-emerald-500/20">
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(id, name) {
+        document.getElementById('deleteCourseId').value = id;
+        document.getElementById('deleteCourseName').innerText = name;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>

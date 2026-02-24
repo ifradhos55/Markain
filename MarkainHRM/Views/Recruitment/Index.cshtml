@@ -1,0 +1,114 @@
+@model IEnumerable<OzarkLMS.Models.JobPosting>
+
+@{
+    ViewData["Title"] = "Careers at Markain";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="p-4 md:p-8 lg:p-12 max-w-[1700px] mx-auto space-y-12 md:space-y-16">
+    <!-- Sophisticated Hero Section -->
+    <div class="relative overflow-hidden rounded-[2.5rem] md:rounded-4xl bg-emerald-950 p-10 md:p-24 shadow-premium-dark text-center">
+        <!-- Dynamic 3D Waves -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden container-waves">
+            <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="rec-wave-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
+                        <stop offset="100%" stop-color="transparent" />
+                    </linearGradient>
+                </defs>
+                <path class="rec-wave r-1" d="M0,300 Q360,250 720,300 T1440,300 V600 H0 Z" fill="url(#rec-wave-grad)" />
+                <path class="rec-wave r-2" d="M0,400 Q360,450 720,400 T1440,400 V600 H0 Z" fill="#34D399" opacity="0.1" />
+            </svg>
+        </div>
+
+        <style>
+            .rec-wave { animation: rec-float 18s ease-in-out infinite alternate; }
+            .r-1 { animation-duration: 20s; }
+            .r-2 { animation-duration: 25s; animation-delay: -8s; }
+            @@keyframes rec-float {
+                from { transform: translateY(0) scaleY(1); }
+                to { transform: translateY(-30px) scaleY(1.05); }
+            }
+        </style>
+        
+        <div class="relative z-10 space-y-6 max-w-4xl mx-auto">
+            <span class="px-4 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em]">Institutional Growth</span>
+            <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
+                Shape the Future of <span class="text-emerald-500">Human Capital.</span>
+            </h1>
+            <p class="text-emerald-100/60 text-lg md:text-xl font-medium leading-relaxed">
+                We're architecting the next generation of management systems. Join our elite team of innovators and specialists.
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-6 py-4 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-top-2">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span class="font-bold text-sm">@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <!-- Opportunity Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @foreach (var item in Model)
+        {
+            <div class="group relative bg-white dark:bg-emerald-950/20 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col min-h-[400px]">
+                <a asp-action="Details" asp-route-id="@item.Id" class="absolute inset-0 z-0"></a>
+                
+                <div class="p-10 flex-1 flex flex-col relative z-10">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="px-4 py-1 rounded-full bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-900/60 dark:text-emerald-50/60 text-[10px] font-black uppercase tracking-widest border border-emerald-900/5 dark:border-emerald-50/5">
+                            @item.Department?.Name
+                        </span>
+                        <div class="flex items-center gap-2 text-[10px] font-black text-emerald-900/20 dark:text-emerald-50/20 uppercase tracking-widest">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                            @item.PostedDate.ToString("MMM dd, yyyy")
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-3xl font-black text-emerald-950 dark:text-white tracking-tight leading-tight mb-6 group-hover:text-emerald-500 transition-colors">
+                        @item.Title
+                    </h2>
+                    
+                    <div class="flex flex-wrap gap-6 text-xs font-bold text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-tighter">
+                        <span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-500"></i> @item.Location</span>
+                        <span class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-emerald-500"></i> @item.EmploymentType</span>
+                    </div>
+
+                    <div class="mt-auto pt-10 flex items-center justify-between border-t border-emerald-900/5 dark:border-emerald-50/5">
+                        <div class="flex items-center gap-3">
+                            <div class="flex -space-x-3">
+                                @if (item.Applications != null)
+                                {
+                                    @foreach(var app in item.Applications.Take(3)) {
+                                        <div class="w-9 h-9 rounded-xl border-4 border-white dark:border-emerald-950 bg-emerald-900 dark:bg-emerald-500 flex items-center justify-center text-[10px] font-black text-white dark:text-emerald-950 shadow-md">
+                                            @app.Candidate.FirstName.Substring(0,1)
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <span class="text-[9px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">
+                                @(item.Applications?.Count ?? 0) ACTIVE CANDIDATES
+                            </span>
+                        </div>
+                        <div class="text-emerald-500 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                            <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="bg-white/50 dark:bg-emerald-900/10 backdrop-blur-sm rounded-4xl border-2 border-dashed border-emerald-900/5 dark:border-emerald-50/5 p-32 text-center max-w-4xl mx-auto">
+            <i data-lucide="telescope" class="w-16 h-16 text-emerald-900/10 mx-auto mb-6"></i>
+            <h3 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter mb-2">Steady Operations</h3>
+            <p class="text-emerald-900/40 dark:text-emerald-50/40 font-bold">The team is currently at optimal capacity. Check back soon for new openings.</p>
+        </div>
+    }
+</div>

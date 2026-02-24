@@ -1,0 +1,149 @@
+@model OzarkLMS.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Sign Up";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - Markain Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            750: '#2d3748',
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+        // Init Dark Mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+    <style>body { font-family: 'Outfit', sans-serif; }</style>
+</head>
+<body class="bg-[#FAFBFC] dark:bg-slate-900 h-screen flex items-center justify-center p-4 transition-colors duration-300 relative overflow-hidden">
+    <!-- Animated Background -->
+    <partial name="_AuthBackground" />
+
+    <div id="register-card" class="w-full max-w-md bg-white dark:bg-emerald-950/20 backdrop-blur-2xl rounded-4xl p-10 border border-emerald-500/10 shadow-premium relative z-10 transition-all duration-700">
+        <div class="text-center mb-8">
+            <!-- Logo -->
+            <div class="flex items-center justify-center mb-6">
+                 <img src="~/images/logo.jpg" asp-append-version="true" alt="Markain Human Resources Logo" class="h-16 w-auto object-contain drop-shadow-md rounded-xl mr-4" />
+                 <div class="flex flex-col justify-center text-left">
+                     <h1 class="font-extrabold text-3xl tracking-wider leading-none text-[#047857] dark:text-emerald-500 drop-shadow-sm">MARKAIN</h1>
+                     <p class="text-xs font-bold text-[#047857] dark:text-emerald-400 uppercase tracking-[0.25em] leading-none mt-1">MANAGEMENT SYSTEM</p>
+                 </div>
+            </div>
+            <h1 class="text-2xl font-bold text-[#047857] dark:text-white">Create Account</h1>
+            <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Join Markain Management System</p>
+        </div>
+
+        <form asp-action="Register" method="post" class="space-y-4" id="register-form">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm font-medium text-center"></div>
+            
+            <div>
+                <label asp-for="Username" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Username</label>
+                <input asp-for="Username" class="w-full rounded-lg border-gray-300 dark:border-slate-600 px-4 py-2.5 bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:ring-2 focus:ring-[#047857] dark:focus:ring-emerald-500 outline-none transition-all dark:text-white form-input-field" />
+                <span asp-validation-for="Username" class="text-red-500 text-xs"></span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                     <label asp-for="Password" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+                     <input asp-for="Password" class="w-full rounded-lg border-gray-300 dark:border-slate-600 px-4 py-2.5 bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:ring-2 focus:ring-[#047857] dark:focus:ring-emerald-500 outline-none transition-all dark:text-white form-input-field" />
+                     <span asp-validation-for="Password" class="text-red-500 text-xs"></span>
+                </div>
+                <div>
+                     <label asp-for="ConfirmPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm</label>
+                     <input asp-for="ConfirmPassword" class="w-full rounded-lg border-gray-300 dark:border-slate-600 px-4 py-2.5 bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:ring-2 focus:ring-[#047857] dark:focus:ring-emerald-500 outline-none transition-all dark:text-white form-input-field" />
+                     <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs"></span>
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="Role" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">I am a/an...</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="cursor-pointer">
+                        <input type="radio" asp-for="Role" value="student" class="peer sr-only form-input-field" checked />
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-600 p-2 text-center text-sm font-medium text-slate-600 dark:text-slate-400 peer-checked:bg-[#047857] dark:peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-[#047857] dark:peer-checked:border-emerald-600 transition-all hover:bg-gray-50 dark:hover:bg-slate-700">Employee</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" asp-for="Role" value="instructor" class="peer sr-only form-input-field" />
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-600 p-2 text-center text-sm font-medium text-slate-600 dark:text-slate-400 peer-checked:bg-[#047857] dark:peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-[#047857] dark:peer-checked:border-emerald-600 transition-all hover:bg-gray-50 dark:hover:bg-slate-700">Manager</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" asp-for="Role" value="admin" class="peer sr-only form-input-field" />
+                        <div class="rounded-lg border border-gray-200 dark:border-slate-600 p-2 text-center text-sm font-medium text-slate-600 dark:text-slate-400 peer-checked:bg-[#047857] dark:peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-[#047857] dark:peer-checked:border-emerald-600 transition-all hover:bg-gray-50 dark:hover:bg-slate-700">Admin</div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl mt-2 form-input-field hover:scale-[1.02] transition-all">
+                Create Account
+            </button>
+        </form>
+
+
+        <div class="mt-6 pt-6 border-t border-gray-100 dark:border-slate-700 text-center text-sm text-slate-500 dark:text-slate-400">
+            Already have an account? 
+            <a asp-action="Login" class="font-bold text-[#047857] dark:text-emerald-400 hover:underline">Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.getElementById('register-card');
+            const inputs = document.querySelectorAll('.form-input-field');
+            const form = document.getElementById('register-form');
+
+            // Emerald Glow Classes (Default)
+            const defaultClasses = ['border-emerald-500/10', 'shadow-premium'];
+            // High-Performance Glow Classes (Active)
+            const activeClasses = ['border-emerald-500/40', 'shadow-[0_0_40px_rgba(16,185,129,0.15)]'];
+
+            function setGlow(isActive) {
+                if (isActive) {
+                    card.classList.remove(...defaultClasses);
+                    card.classList.add(...activeClasses);
+                    card.style.transform = 'translateY(-5px) scale(1.01)';
+                } else {
+                    card.classList.remove(...activeClasses);
+                    card.classList.add(...defaultClasses);
+                    card.style.transform = 'translateY(0) scale(1)';
+                }
+            }
+
+            // Add event listeners to all inputs
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => setGlow(true));
+                input.addEventListener('blur', (e) => {
+                    // Only revert to red if we clicked outside the form entirely
+                    setTimeout(() => {
+                        if (!form.contains(document.activeElement)) {
+                            setGlow(false);
+                        }
+                    }, 10);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

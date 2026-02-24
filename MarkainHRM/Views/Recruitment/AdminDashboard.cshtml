@@ -1,0 +1,165 @@
+@model IEnumerable<OzarkLMS.Models.JobApplication>
+
+@{
+    ViewData["Title"] = "ATS Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var recentListings = ViewBag.RecentListings as IEnumerable<OzarkLMS.Models.JobPosting>;
+}
+
+<div class="p-6 lg:p-12 max-w-[1700px] mx-auto space-y-12">
+    <!-- Executive Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="space-y-2">
+            <span class="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600">Talent Acquisition</span>
+            <h1 class="text-5xl md:text-6xl font-black text-emerald-950 dark:text-white tracking-tighter leading-none">
+                ATS <span class="text-emerald-500">Command</span>
+            </h1>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <a asp-action="Create" class="bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 px-8 py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/10 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                POST OPPORTUNITY
+            </a>
+        </div>
+    </div>
+
+    <!-- Talent Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Open Requisitions</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@ViewBag.ActiveJobsCount</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Total Talent Pool</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-950 dark:text-white tracking-tighter">@ViewBag.TotalApplications</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-emerald-950/20 p-8 rounded-4xl border-l-[6px] border-emerald-500 shadow-premium">
+            <h3 class="text-emerald-900/40 dark:text-emerald-50/40 font-black text-[10px] uppercase tracking-widest mb-4">Urgent Review</h3>
+            <div class="flex items-end justify-between">
+                <p class="text-5xl font-black text-emerald-500 tracking-tighter">@ViewBag.NewApplications</p>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 animate-pulse">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Application Pipeline -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white dark:bg-emerald-950/20 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 shadow-premium overflow-hidden">
+                <div class="p-8 border-b border-emerald-900/5 dark:border-emerald-50/5 flex items-center justify-between">
+                    <h2 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Talent Pipeline</h2>
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black rounded-full uppercase tracking-widest">Real-time Pulse</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-emerald-50/50 dark:bg-emerald-950/40">
+                            <tr>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Candidate</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Role Spec</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">Pipeline Stage</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest text-right">Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-emerald-900/5 dark:divide-emerald-50/5">
+                            @foreach (var item in Model)
+                            {
+                                <tr class="hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 transition-colors group">
+                                    <td class="px-8 py-6">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-2xl bg-emerald-900 dark:bg-emerald-500 flex items-center justify-center text-white dark:text-emerald-950 font-black text-xs shadow-lg group-hover:scale-110 transition-transform">
+                                                @item.Candidate.FirstName.Substring(0,1)@item.Candidate.LastName.Substring(0,1)
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="font-black text-emerald-950 dark:text-white">@item.Candidate.FirstName @item.Candidate.LastName</span>
+                                                <span class="text-[9px] font-bold text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">@item.Candidate.Email</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs font-black text-emerald-950 dark:text-white">@item.JobPosting.Title</span>
+                                            <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">@item.JobPosting.Department?.Name</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black rounded-full uppercase tracking-widest border border-emerald-500/10">
+                                            @item.Status
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        <a asp-action="Details" asp-route-id="@item.JobPostingId" class="text-[10px] font-black text-emerald-900/40 hover:text-emerald-500 uppercase tracking-widest transition-colors flex items-center justify-end gap-2 group/btn">
+                                            MANAGE <i data-lucide="chevron-right" class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="px-8 py-20 text-center">
+                                        <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-4 text-emerald-900/10"></i>
+                                        <p class="text-emerald-900/40 dark:text-emerald-50/40 font-bold uppercase tracking-widest text-xs">No active applications in pipeline</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategic Insights (Right Bar) -->
+        <div class="space-y-8">
+            <div class="bg-white dark:bg-emerald-950/20 rounded-4xl border border-emerald-900/5 dark:border-emerald-50/5 p-8 shadow-premium h-full">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Recent Listings</h2>
+                    <a asp-action="Index" class="text-[10px] font-black text-emerald-900/40 hover:text-emerald-500 uppercase tracking-widest transition-colors">View All</a>
+                </div>
+
+                <div class="space-y-4">
+                    @if (recentListings != null)
+                    {
+                        @foreach (var job in recentListings)
+                        {
+                            <div class="p-6 rounded-3xl bg-emerald-50/30 dark:bg-emerald-500/5 border border-transparent hover:border-emerald-500/20 transition-all group">
+                                <div class="flex items-start gap-4 mb-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-white dark:bg-emerald-900/50 flex items-center justify-center text-emerald-500 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-black text-emerald-950 dark:text-white text-sm leading-tight">@job.Title</h4>
+                                        <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-1">@job.Department?.Name</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between pt-4 border-t border-emerald-900/5 dark:border-emerald-50/5">
+                                    <span class="text-[9px] font-black text-emerald-900/20 uppercase tracking-widest">@(job.Applications.Count) APP.</span>
+                                    <a asp-action="Details" asp-route-id="@job.Id" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">CONFIGURE</a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                
+                <div class="mt-8 p-6 rounded-3xl bg-emerald-950 text-white text-center space-y-4 shadow-xl">
+                    <p class="text-[10px] font-bold text-emerald-100/40 uppercase tracking-[0.2em]">Scale your elite workforce</p>
+                    <a asp-action="Create" class="w-full inline-block bg-emerald-500 text-emerald-950 text-[10px] font-black py-4 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest shadow-lg shadow-emerald-500/10">
+                        OPEN NEW POSITION
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

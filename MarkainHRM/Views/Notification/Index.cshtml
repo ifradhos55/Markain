@@ -1,0 +1,85 @@
+@model IEnumerable<OzarkLMS.Models.Notification>
+@using System.Security.Claims
+
+<div class="p-8 max-w-[1000px] mx-auto min-h-screen">
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+             <button onclick="history.back()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400">
+                 <i data-lucide="minimize-2" class="w-6 h-6"></i>
+             </button>
+             <h1 class="text-3xl font-bold text-[#004B87] dark:text-white">Notifications</h1>
+        </div>
+        <div class="flex items-center gap-3">
+             @if(Model.Any())
+             {
+                 <div id="clear-all-wrapper" class="relative">
+                     <!-- Initial Button -->
+                     <button id="btn-clear-all" onclick="toggleClearConfirm(true)" class="text-slate-500 dark:text-slate-400 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black px-4 py-2 rounded-lg transition-all text-sm font-bold">
+                         Clear All
+                     </button>
+                     
+                     <!-- Confirmation State -->
+                     <div id="msg-clear-confirm" class="hidden absolute right-0 top-0 flex items-center bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-lg overflow-hidden shadow-lg h-full">
+                         <span class="text-xs font-bold text-red-600 dark:text-red-200 px-3 whitespace-nowrap">Clear All?</span>
+                         <button onclick="clearAllNotifications()" class="h-full px-3 text-red-600 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center">
+                             <i data-lucide="check" class="w-4 h-4"></i>
+                         </button>
+                         <div class="w-[1px] h-4 bg-red-200 dark:bg-red-800"></div>
+                         <button onclick="toggleClearConfirm(false)" class="h-full px-3 text-red-600 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center">
+                             <i data-lucide="x" class="w-4 h-4"></i>
+                         </button>
+                     </div>
+                 </div>
+             }
+             @if(User.IsInRole("admin") || User.IsInRole("instructor"))
+             {
+                 <a asp-action="Send" class="bg-[#DA291C] text-white px-4 py-2 rounded-lg font-bold hover:bg-[#b01e14] transition-colors shadow-sm flex items-center text-sm">
+                     <i data-lucide="send" class="w-4 h-4 mr-2"></i> Send Notification
+                 </a>
+             }
+        </div>
+    </div>
+
+    @if(!Model.Any())
+    {
+        <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-[#004B87] dark:text-blue-400">
+                <i data-lucide="bell-off" class="w-8 h-8"></i>
+            </div>
+            <p class="text-slate-400 font-medium">You have no notifications.</p>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-4" id="notification-list">
+             <partial name="_NotificationList" model="Model" />
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // --- Clear All Logic ---
+        function toggleClearConfirm(show) {
+            const btn = document.getElementById('btn-clear-all');
+            const confirm = document.getElementById('msg-clear-confirm');
+            
+            if(show) {
+                btn.classList.add('invisible');
+                confirm.classList.remove('hidden');
+            } else {
+                btn.classList.remove('invisible');
+                confirm.classList.add('hidden');
+            }
+        }
+
+        async function clearAllNotifications() {
+             try {
+                const res = await fetch(`/Notification/ClearAll`, { method: 'POST' });
+                if(res.ok) {
+                    location.reload();
+                }
+            } catch(e) { console.error(e); }
+        }
+    </script>
+}

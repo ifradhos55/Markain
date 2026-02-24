@@ -1,0 +1,42 @@
+@model OzarkLMS.Models.Course
+
+<div class="p-8 max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Create New Course</h1>
+    
+    <form asp-action="Create" class="space-y-6">
+        <div>
+            <label asp-for="Name" class="block text-sm font-medium text-slate-700 mb-1">Course Name</label>
+            <input asp-for="Name" class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-all shadow-sm" placeholder="Enter Course Name" />
+            <span asp-validation-for="Name" class="text-red-500 text-xs"></span>
+        </div>
+
+        <div>
+            <label asp-for="Code" class="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
+            <input asp-for="Code" class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-all shadow-sm" placeholder="Enter Course Code" />
+            <span asp-validation-for="Code" class="text-red-500 text-xs"></span>
+        </div>
+
+        <div>
+            <label asp-for="Term" class="block text-sm font-medium text-slate-700 mb-1">Term</label>
+            <input asp-for="Term" class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-all shadow-sm" placeholder="Enter Term" />
+            <span asp-validation-for="Term" class="text-red-500 text-xs"></span>
+        </div>
+
+        @if (User.IsInRole("admin"))
+        {
+            <div>
+                <label asp-for="InstructorId" class="block text-sm font-medium text-slate-700 mb-1">Assign Manager (Optional)</label>
+                <select asp-for="InstructorId" class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 focus:bg-white transition-all shadow-sm" 
+                        asp-items="@(new SelectList(ViewBag.Instructors, "Id", "Username"))">
+                    <option value="">-- Select Manager --</option>
+                </select>
+            </div>
+        }
+
+        <div class="pt-4">
+            <button type="submit" class="w-full bg-[#2D3B45] text-white py-3 rounded-xl font-bold shadow-lg hover:bg-[#1f2930] transition-colors">
+                Create Course
+            </button>
+        </div>
+    </form>
+</div>

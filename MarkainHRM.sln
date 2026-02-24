@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkainHRM", "MarkainHRM\MarkainHRM.csproj", "{397B09BF-9E10-E0AF-CF71-7C1E226C663E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{397B09BF-9E10-E0AF-CF71-7C1E226C663E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{397B09BF-9E10-E0AF-CF71-7C1E226C663E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{397B09BF-9E10-E0AF-CF71-7C1E226C663E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{397B09BF-9E10-E0AF-CF71-7C1E226C663E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58383C0B-F6DC-46E6-8DEA-709FC7123365}
+	EndGlobalSection
+EndGlobal

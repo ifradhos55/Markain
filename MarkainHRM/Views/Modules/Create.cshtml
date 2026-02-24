@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Create Module";
+}
+
+<div class="p-8 max-w-[600px] mx-auto">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 bg-gray-50">
+             <h1 class="text-xl font-bold text-[#004B87]">Create New Module</h1>
+        </div>
+        
+        <form asp-action="Create" enctype="multipart/form-data" class="p-8 space-y-6">
+            <input type="hidden" name="CourseId" value="@ViewBag.CourseId" />
+            
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Module Title</label>
+                <input name="Title" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-[#004B87] focus:ring-[#004B87]" placeholder="e.g. Unit 1: Introduction" required />
+            </div>
+
+            <!-- Optional Initial Content -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <h3 class="text-sm font-bold text-[#004B87] mb-3">Add Content (Optional)</h3>
+                
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-600 mb-2">Upload File</label>
+                    <input type="file" name="file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-[#004B87] hover:file:bg-blue-200"/>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-2">Display Mode</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="displayMode" value="link" checked class="text-[#004B87] focus:ring-[#004B87]" />
+                            <span class="ml-2 text-sm text-slate-700">List View (Download/Link)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="displayMode" value="embed" class="text-[#004B87] focus:ring-[#004B87]" />
+                            <span class="ml-2 text-sm text-slate-700">Direct View (Embed)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-6 border-t border-gray-100">
+                <a asp-controller="Courses" asp-action="Details" asp-route-id="@ViewBag.CourseId" class="mr-4 px-6 py-2 text-slate-500 font-bold hover:text-slate-700">Cancel</a>
+                <button type="submit" class="bg-[#004B87] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#003d6e] shadow-lg shadow-blue-900/20">
+                    Create Module
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

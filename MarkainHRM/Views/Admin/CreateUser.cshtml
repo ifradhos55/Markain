@@ -1,0 +1,32 @@
+@model OzarkLMS.Models.User
+
+<div class="p-8 max-w-lg mx-auto">
+    <h1 class="text-3xl font-bold text-[#004B87] mb-8">Create New User</h1>
+
+    <form asp-action="CreateUser" class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 space-y-6">
+        <div>
+            <label asp-for="Username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+            <input asp-for="Username" class="w-full rounded-lg border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#004B87] focus:border-transparent outline-none transition-all" />
+            <span asp-validation-for="Username" class="text-red-500 text-xs"></span>
+        </div>
+
+        <div>
+            <label asp-for="Password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <input asp-for="Password" type="password" class="w-full rounded-lg border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#004B87] focus:border-transparent outline-none transition-all" />
+            <span asp-validation-for="Password" class="text-red-500 text-xs"></span>
+        </div>
+
+        <div>
+            <label asp-for="Role" class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+            <select asp-for="Role" class="w-full rounded-lg border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#004B87] focus:border-transparent outline-none transition-all">
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <button type="submit" class="w-full bg-[#DA291C] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#b01e14] transition-colors">
+            Create User
+        </button>
+    </form>
+</div>

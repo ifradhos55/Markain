@@ -1,0 +1,350 @@
+@model OzarkLMS.ViewModels.SocialHubViewModel
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Corporate Ecosystem Hub";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .ecosystem-card {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(6, 78, 59, 0.05);
+    }
+    .ecosystem-card:hover {
+        transform: translateY(-8px) scale(1.01);
+        box-shadow: 0 40px 80px -20px rgba(6, 78, 59, 0.12);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .dark .ecosystem-card {
+        background: rgba(2, 44, 34, 0.4);
+        border-color: rgba(255, 255, 255, 0.03);
+    }
+    .dark .ecosystem-card:hover {
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+    }
+
+    .pulse-status {
+        position: relative;
+    }
+    .pulse-status::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background-color: #10b981;
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #10b981;
+    }
+    .dark .pulse-status::after {
+        border-color: #022c22;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(6, 78, 59, 0.1); border-radius: 10px; }
+</style>
+
+<div class="p-4 md:p-8 lg:p-12 max-w-[1700px] mx-auto space-y-12 md:space-y-16">
+    <!-- Executive Ecosystem Header -->
+    <div class="relative rounded-[2.5rem] md:rounded-[4rem] overflow-hidden bg-emerald-950 p-8 md:p-12 lg:p-20 shadow-2xl border border-emerald-900/20 group">
+        <!-- Dynamic 3D Waves -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden container-waves">
+            <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="hub-wave-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#10B981" stop-opacity="0.4" />
+                        <stop offset="100%" stop-color="transparent" />
+                    </linearGradient>
+                </defs>
+                <path class="hub-wave hb-1" d="M0,300 Q360,250 720,300 T1440,300 V600 H0 Z" fill="url(#hub-wave-grad)" />
+                <path class="hub-wave hb-2" d="M0,400 Q360,450 720,400 T1440,400 V600 H0 Z" fill="#34D399" opacity="0.1" />
+            </svg>
+        </div>
+
+        <style>
+            .hub-wave { animation: hub-float 20s ease-in-out infinite alternate; }
+            .hb-1 { animation-duration: 25s; }
+            .hb-2 { animation-duration: 30s; animation-delay: -10s; }
+            @@keyframes hub-float {
+                from { transform: translateY(0) scaleY(1); }
+                to { transform: translateY(-30px) scaleY(1.08); }
+            }
+        </style>
+
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="space-y-6 max-w-2xl text-center md:text-left">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Institutional Synergy Network</span>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-none mb-6">Company <span class="text-emerald-500">Hub</span></h1>
+                <p class="text-emerald-100/40 text-lg font-bold italic leading-relaxed">
+                    Facilitating high-velocity institutional collaboration through encrypted semantic streams.
+                </p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                    <button onclick="document.getElementById('createGroupForm').classList.toggle('hidden')" 
+                            class="bg-emerald-500 text-emerald-950 px-8 py-4 rounded-3xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
+                        Initialize Channel
+                    </button>
+                    <div class="flex -space-x-4">
+                        @foreach(var chat in Model.PrivateChats.Take(4))
+                        {
+                            var u = chat.User1Id == Model.CurrentUser.Id ? chat.User2 : chat.User1;
+                            <div class="w-12 h-12 rounded-2xl border-4 border-emerald-950 bg-emerald-900 flex items-center justify-center text-white font-black text-xs overflow-hidden shadow-lg">
+                                @if(!string.IsNullOrEmpty(u?.ProfilePictureUrl)) { <img src="@u.ProfilePictureUrl" class="w-full h-full object-cover"/> }
+                                else { <span>@(u?.Username?.Substring(0,1).ToUpper())</span> }
+                            </div>
+                        }
+                        <div class="w-12 h-12 rounded-2xl border-4 border-emerald-950 bg-emerald-800 flex items-center justify-center text-emerald-400 font-black text-xs shadow-lg">
+                            +@Model.ChatGroups.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:block w-96 h-96 relative">
+                 <div class="absolute inset-0 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+                 <div class="relative w-full h-full border border-emerald-500/20 rounded-[3rem] flex items-center justify-center backdrop-blur-sm">
+                     <i data-lucide="share-2" class="w-32 h-32 text-emerald-500/20"></i>
+                     <div class="absolute top-10 right-10 p-4 bg-emerald-500 rounded-2xl animate-bounce">
+                         <i data-lucide="zap" class="w-6 h-6 text-emerald-950"></i>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Command Bar -->
+    <div class="relative group max-w-4xl mx-auto">
+        <div class="absolute inset-0 bg-emerald-500/5 blur-2xl group-focus-within:bg-emerald-500/10 transition-all"></div>
+        <div class="relative flex items-center gap-6 bg-white dark:bg-emerald-950/20 border border-emerald-900/5 dark:border-emerald-50/5 rounded-[2.5rem] p-4 shadow-premium group-focus-within:border-emerald-500/30 transition-all">
+            <div class="w-14 h-14 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                <i data-lucide="search" class="w-7 h-7"></i>
+            </div>
+            <input id="globalUserSearch" 
+                   class="flex-1 bg-transparent border-none text-xl font-bold placeholder:text-emerald-900/20 dark:placeholder:text-emerald-50/20 outline-none" 
+                   placeholder="Identify node or institutional channel..." 
+                   oninput="searchUsersGlobal(this.value, this)" />
+            <div class="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-[10px] font-black text-emerald-500 uppercase tracking-widest hidden md:block">
+                MARK-V COMMAND
+            </div>
+        </div>
+        <div id="globalSearchResults" class="hidden"></div>
+    </div>
+
+    <!-- Initialization Portal (Create Group) -->
+    <div id="createGroupForm" class="hidden bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-500/10 rounded-4xl p-10 animate-in slide-in-from-top-6 duration-500">
+        <div class="flex items-center justify-between mb-10">
+            <div class="space-y-1">
+                <h3 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter">Channel Initialization</h3>
+                <p class="text-emerald-900/40 dark:text-emerald-50/40 text-sm font-bold">Configure a new institutional synergy node</p>
+            </div>
+            <button onclick="document.getElementById('createGroupForm').classList.add('hidden')" class="p-3 hover:bg-red-500/10 text-red-500 rounded-2xl transition-all">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <form asp-action="CreateGroup" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="md:col-span-1 space-y-2">
+                <label class="text-[10px] font-black uppercase tracking-widest text-emerald-950/40 dark:text-emerald-50/40 ml-4">Identifier</label>
+                <input name="name" class="w-full bg-white dark:bg-emerald-950 border-emerald-900/5 dark:border-emerald-50/5 rounded-2xl p-5 text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required placeholder="# marketing-ops" />
+            </div>
+            <div class="md:col-span-2 space-y-2">
+                <label class="text-[10px] font-black uppercase tracking-widest text-emerald-950/40 dark:text-emerald-50/40 ml-4">Operational Scope</label>
+                <input name="description" class="w-full bg-white dark:bg-emerald-950 border-emerald-900/5 dark:border-emerald-50/5 rounded-2xl p-5 text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Describe clinical objectives for this sector..." />
+            </div>
+            <div class="md:col-span-1 flex items-end">
+                <button type="submit" class="w-full bg-emerald-950 dark:bg-emerald-500 text-white dark:text-emerald-950 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:scale-105 active:scale-95 transition-all">
+                    ACTIVATE NODE
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Synergy Streams (Groups) -->
+    <div class="space-y-10">
+        <div class="flex items-end justify-between border-b border-emerald-900/5 dark:border-emerald-50/5 pb-6">
+            <div class="space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Synergy Clusters</span>
+                <h2 class="text-4xl font-black text-emerald-950 dark:text-white tracking-tighter uppercase">Institutional Channels</h2>
+            </div>
+            <div class="px-6 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-xs font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">
+                @Model.ChatGroups.Count Active Nodes
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+            @foreach (var g in Model.ChatGroups.OrderByDescending(x => Model.GroupUnread.ContainsKey(x.Id) && Model.GroupUnread[x.Id] > 0))
+            {
+                int unread = Model.GroupUnread.ContainsKey(g.Id) ? Model.GroupUnread[g.Id] : 0;
+                <a asp-action="Details" asp-route-id="@g.Id" class="block relative group">
+                    <div class="ecosystem-card bg-white dark:bg-emerald-950/20 rounded-[3rem] p-10 flex flex-col h-full relative overflow-hidden shadow-premium">
+                        <!-- Background Accents -->
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all"></div>
+                        
+                        <div class="flex items-start justify-between mb-10 relative z-10">
+                            <div class="w-20 h-20 rounded-[2rem] bg-emerald-950 flex items-center justify-center text-white font-black text-3xl shadow-2xl relative overflow-hidden group-hover:scale-110 transition-all duration-500">
+                                @if (!string.IsNullOrEmpty(g.GroupPhotoUrl)) { <img src="@g.GroupPhotoUrl" class="w-full h-full object-cover"/> }
+                                else { <span>@g.Name.Substring(0, 1).ToUpper()</span> }
+                                @if (unread > 0) { <div class="absolute inset-0 bg-emerald-500/20 backdrop-blur-[2px] animate-pulse"></div> }
+                            </div>
+                            @if (unread > 0)
+                            {
+                                <div class="bg-emerald-500 text-emerald-950 px-4 py-2 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg animate-bounce">
+                                    @unread NEW DATA
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="space-y-3 relative z-10">
+                            <h3 class="text-2xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter group-hover:text-emerald-500 transition-colors">#@g.Name</h3>
+                            <p class="text-emerald-900/40 dark:text-emerald-50/40 text-sm font-bold line-clamp-2 leading-relaxed italic">@g.Description</p>
+                        </div>
+                        
+                        <div class="mt-auto pt-10 flex items-center justify-between relative z-10">
+                             <div class="flex items-center gap-3">
+                                 <div class="flex -space-x-3">
+                                     @foreach(var m in (g.Members ?? new List<OzarkLMS.Models.ChatGroupMember>()).Take(3))
+                                     {
+                                         <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border-2 border-white dark:border-emerald-950 flex items-center justify-center text-[10px] font-black text-emerald-900/40 dark:text-emerald-50/40 overflow-hidden">
+                                             @m.User.Username.Substring(0,1).ToUpper()
+                                         </div>
+                                     }
+                                 </div>
+                                 <span class="text-[10px] font-black text-emerald-900/20 dark:text-emerald-50/20 uppercase tracking-widest">@((g.Members?.Count ?? 0)) Personnel</span>
+                             </div>
+                             <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:translate-x-2 transition-transform">
+                                 <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                             </div>
+                        </div>
+
+                        @if (User.IsInRole("admin") && !g.IsDefault)
+                        {
+                            <form asp-action="DeleteGroup" method="post" class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all" onsubmit="return confirm('Purge institutional record?');">
+                                <input type="hidden" name="groupId" value="@g.Id" />
+                                <button type="submit" class="p-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl transition-all" onclick="event.stopPropagation();">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Direct Synergy Streams (DMs) -->
+    <div class="space-y-10">
+        <div class="flex items-end justify-between border-b border-emerald-900/5 dark:border-emerald-50/5 pb-6">
+            <div class="space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Direct Intelligence</span>
+                <h2 class="text-4xl font-black text-emerald-950 dark:text-white tracking-tighter uppercase">Personnel Streams</h2>
+            </div>
+            <div class="px-6 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-xs font-black text-emerald-900/40 dark:text-emerald-50/40 uppercase tracking-widest">
+                @Model.PrivateChats.Count Synchronizations
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            @foreach (var p in Model.PrivateChats.OrderByDescending(x => Model.PrivateUnread.ContainsKey(x.Id) && Model.PrivateUnread[x.Id] > 0))
+            {
+                int unread = Model.PrivateUnread.ContainsKey(p.Id) ? Model.PrivateUnread[p.Id] : 0;
+                var otherUser = p.User1Id == Model.CurrentUser.Id ? p.User2 : p.User1;
+                <a asp-action="PrivateDetails" asp-route-id="@p.Id" class="block group">
+                    <div class="ecosystem-card bg-white dark:bg-emerald-950/20 rounded-4xl p-8 flex flex-col h-full relative overflow-hidden shadow-premium">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-16 h-16 rounded-[1.5rem] bg-emerald-950 flex items-center justify-center text-white font-black text-2xl shadow-xl overflow-hidden group-hover:scale-110 transition-all pulse-status">
+                                    @if (otherUser != null && !string.IsNullOrEmpty(otherUser.ProfilePictureUrl)) { <img src="@otherUser.ProfilePictureUrl" class="w-full h-full object-cover"/> }
+                                    else { <span>@(otherUser?.Username?.Substring(0, 1).ToUpper() ?? "?")</span> }
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-black text-emerald-950 dark:text-white truncate uppercase tracking-tight">@otherUser?.Username</h3>
+                                <p class="text-[9px] text-emerald-500 font-black uppercase tracking-widest">Secure Stream</p>
+                            </div>
+                            @if (unread > 0)
+                            {
+                                <div class="w-8 h-8 rounded-full bg-emerald-500 text-emerald-950 flex items-center justify-center text-[10px] font-black shadow-lg shadow-emerald-500/20">
+                                    @unread
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="mt-auto pt-6 flex items-center justify-between text-[9px] font-black text-emerald-900/20 dark:text-emerald-50/20 uppercase tracking-[0.3em] border-t border-emerald-900/5 dark:border-emerald-50/5">
+                            <span class="text-emerald-500">ONLINE</span>
+                            <span>@p.LastActivityDate.ToLocalTime().ToString("t")</span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    let _searchTimer;
+    function searchUsersGlobal(query, element) {
+        let portal = document.getElementById('globalSearchResultsPortal');
+        if (!portal) {
+            portal = document.createElement('div');
+            portal.id = 'globalSearchResultsPortal';
+            portal.className = "fixed bg-white dark:bg-emerald-950 border border-emerald-500/20 rounded-[2rem] shadow-2xl overflow-hidden hidden z-[99999] backdrop-blur-3xl";
+            document.body.appendChild(portal);
+        }
+
+        if (!query || query.trim().length < 1) {
+            portal.classList.add('hidden');
+            return;
+        }
+
+        const rect = element.getBoundingClientRect();
+        portal.style.top = (rect.bottom + window.scrollY + 12) + 'px';
+        portal.style.left = (rect.left + window.scrollX) + 'px';
+        portal.style.width = rect.width + 'px';
+
+        portal.innerHTML = '<div class="p-10 text-center text-emerald-900/20 dark:text-emerald-50/20 font-black uppercase tracking-widest text-[10px]">Filtering Ecosystem Nodes...</div>';
+        portal.classList.remove('hidden');
+
+        clearTimeout(_searchTimer);
+        _searchTimer = setTimeout(() => {
+            fetch(`/Collaboration/SearchGlobal?query=${encodeURIComponent(query.trim())}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!Array.isArray(data) || data.length === 0) {
+                        portal.innerHTML = '<div class="p-10 text-center text-emerald-900/20 dark:text-emerald-50/20 font-black uppercase tracking-widest text-[10px]">Zero matches identified</div>';
+                        return;
+                    }
+
+                    portal.innerHTML = data.map(item => `
+                        <div class="flex items-center p-6 hover:bg-emerald-500/5 cursor-pointer border-b border-emerald-900/5 dark:border-emerald-50/5 last:border-0 group select-none" 
+                             onclick="window.location.href='${item.type === 'user' ? '/Collaboration/StartPrivateChat?targetUserId=' + item.id : '/Collaboration/Details/' + item.id}'">
+                            <div class="w-14 h-14 rounded-2xl overflow-hidden bg-emerald-950 flex-shrink-0 flex items-center justify-center text-xl font-black text-white shadow-lg group-hover:scale-110 transition-all">
+                                ${item.photo ? `<img src="${item.photo}" class="w-full h-full object-cover">` : (item.name || '?')[0]}
+                            </div>
+                            <div class="ml-6 flex-1 min-w-0">
+                                <p class="text-lg font-black text-emerald-950 dark:text-white truncate uppercase tracking-tight">${item.name}</p>
+                                <p class="text-[9px] text-emerald-500 uppercase font-black tracking-[0.2em] opacity-60">${item.type} Node</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-6 h-6 text-emerald-900/10 dark:text-emerald-50/10 group-hover:text-emerald-500 group-hover:translate-x-2 transition-all"></i>
+                        </div>
+                    `).join('');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+        }, 300);
+    }
+
+    document.addEventListener('mousedown', e => {
+        const p = document.getElementById('globalSearchResultsPortal');
+        if (p && !p.contains(e.target) && !e.target.closest('#globalUserSearch')) {
+            p.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    </script>
+}

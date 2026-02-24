@@ -1,0 +1,77 @@
+@model OzarkLMS.Models.JobPosting
+
+@{
+    ViewData["Title"] = "Create Job Posting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-3xl mx-auto p-8">
+    <div class="mb-6">
+        <a asp-action="AdminDashboard" class="text-slate-500 hover:text-[#004B87] flex items-center text-sm font-medium">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-8">
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-6">Create New Job Posting</h1>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="All" class="text-red-500 text-sm mb-4"></div>
+            <div class="mb-4">
+                <label asp-for="Title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                <input asp-for="Title" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]" />
+                <span asp-validation-for="Title" class="text-red-500 text-xs"></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                <div>
+                    <label asp-for="DepartmentId" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Department</label>
+                    <select asp-for="DepartmentId" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]" asp-items="@(new SelectList(ViewBag.Departments, "Id", "Name"))">
+                        <option value="">-- Select Department --</option>
+                    </select>
+                </div>
+                <div>
+                     <label asp-for="Location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                     <input asp-for="Location" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                <div>
+                    <label asp-for="EmploymentType" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Type</label>
+                    <select asp-for="EmploymentType" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]">
+                        <option value="Full-Time">Full-Time</option>
+                        <option value="Part-Time">Part-Time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+                <div>
+                    <label asp-for="SalaryRangeMin" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Min Salary</label>
+                    <input asp-for="SalaryRangeMin" type="number" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]" />
+                </div>
+                <div>
+                    <label asp-for="SalaryRangeMax" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max Salary</label>
+                    <input asp-for="SalaryRangeMax" type="number" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                <textarea asp-for="Description" rows="5" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]"></textarea>
+                <span asp-validation-for="Description" class="text-red-500 text-xs"></span>
+            </div>
+
+            <div class="mb-6">
+                <label asp-for="Requirements" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                <textarea asp-for="Requirements" rows="4" class="w-full rounded-lg border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-[#004B87] focus:border-[#004B87]"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end">
+                <button type="submit" class="bg-[#004B87] dark:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-[#003d6e] dark:hover:bg-blue-700 transition-colors">
+                    Post Job
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Project specifics
+temp/
+tmp_build/
+MarkainHRM/wwwroot/temp/
+MarkainHRM/wwwroot/lib/
+MarkainHRM/obj/
+MarkainHRM/bin/
